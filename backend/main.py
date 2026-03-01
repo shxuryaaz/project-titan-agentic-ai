@@ -20,7 +20,8 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default port
+    # Add your Vercel preview URL (e.g. https://project-titan-agentic-ai-xxx.vercel.app) if needed
+    allow_origins=["http://localhost:5173", "https://project-titan-agentic-ai.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
