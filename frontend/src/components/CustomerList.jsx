@@ -16,6 +16,7 @@ function CustomerList() {
     notes: ''
   });
   const [formError, setFormError] = useState('');
+  const [emailValid, setEmailValid] = useState(true);
 
   useEffect(() => {
     loadCustomers();
@@ -53,8 +54,10 @@ function CustomerList() {
     e.preventDefault();
     if (!validateEmail(formData.email)) {
       setFormError('Please enter a valid email address.');
+      setEmailValid(false);
       return;
     }
+    setEmailValid(true);
     setFormError('');
     try {
       await customerAPI.create(formData);
@@ -80,6 +83,11 @@ function CustomerList() {
   const validateEmail = (email) => {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
+  };
+
+  const handleEmailChange = (e) => {
+    setFormData({ ...formData, email: e.target.value });
+    setEmailValid(validateEmail(e.target.value));
   };
 
   if (loading) {
@@ -144,8 +152,8 @@ function CustomerList() {
                 placeholder="Email *"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+                onChange={handleEmailChange}
+                className={`rounded-md shadow-sm px-4 py-2 border ${emailValid ? 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' : 'border-red-500 focus:border-red-500 focus:ring-red-500'}`}
               />
               <input
                 type="text"
