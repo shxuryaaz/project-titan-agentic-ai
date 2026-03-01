@@ -40,7 +40,7 @@ function CustomerList() {
     }
 
     try {
-      const response = await customerAPI.search(searchQuery);
+      const response = await customerAPI.search(searchQuery, searchQuery);
       setCustomers(response.data.customers);
     } catch (err) {
       console.error('Search failed:', err);
