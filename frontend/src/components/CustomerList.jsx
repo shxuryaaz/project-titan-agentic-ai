@@ -90,7 +90,7 @@ function CustomerList() {
       <div className="mb-6 flex gap-2">
         <input
           type="text"
-          placeholder="Search customers..."
+          placeholder="Search by name or company"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
