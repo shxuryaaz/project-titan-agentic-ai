@@ -73,8 +73,9 @@ function CustomerList() {
     if (!confirm('Are you sure you want to delete this customer?')) return;
 
     try {
-      await customerAPI.delete(id);
-      loadCustomers();
+      await customerAPI.deleteCustomer(id);
+      const updatedCustomers = customers.filter(customer => customer.id !== id);
+      setCustomers(updatedCustomers);
     } catch (err) {
       alert('Failed to delete customer');
     }
