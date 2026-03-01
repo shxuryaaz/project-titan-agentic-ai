@@ -6,6 +6,7 @@ function CustomerList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('name'); // Added search type state
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -40,7 +41,7 @@ function CustomerList() {
     }
 
     try {
-      const response = await customerAPI.search(searchQuery);
+      const response = await customerAPI.search(searchQuery, searchType); // Modified to include searchType
       setCustomers(response.data.customers);
     } catch (err) {
       console.error('Search failed:', err);
@@ -87,10 +88,18 @@ function CustomerList() {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex gap-2 items-center">
+        <select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+        >
+          <option value="name">Name</option>
+          <option value="company">Company</option>
+        </select>
         <input
           type="text"
-          placeholder="Search customers..."
+          placeholder={`Search by ${searchType}...`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
