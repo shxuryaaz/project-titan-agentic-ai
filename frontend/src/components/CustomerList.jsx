@@ -6,6 +6,7 @@ function CustomerList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('name'); // Added search type state
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -14,6 +15,8 @@ function CustomerList() {
     company: '',
     notes: ''
   });
+  const [formError, setFormError] = useState('');
+  const [emailValid, setEmailValid] = useState(true);
 
   useEffect(() => {
     loadCustomers();
@@ -40,7 +43,7 @@ function CustomerList() {
     }
 
     try {
-      const response = await customerAPI.search(searchQuery);
+      const response = await customerAPI.search(searchQuery, searchType); // Adjusted for clarity
       setCustomers(response.data.customers);
     } catch (err) {
       console.error('Search failed:', err);
@@ -49,6 +52,13 @@ function CustomerList() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateEmail(formData.email)) {
+      setFormError('Please enter a valid email address.');
+      setEmailValid(false);
+      return;
+    }
+    setEmailValid(true);
+    setFormError('');
     try {
       await customerAPI.create(formData);
       setShowAddForm(false);
@@ -63,11 +73,22 @@ function CustomerList() {
     if (!confirm('Are you sure you want to delete this customer?')) return;
 
     try {
-      await customerAPI.delete(id);
-      loadCustomers();
+      await customerAPI.deleteCustomer(id);
+      const updatedCustomers = customers.filter(customer => customer.id !== id);
+      setCustomers(updatedCustomers);
     } catch (err) {
       alert('Failed to delete customer');
     }
+  };
+
+  const validateEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const handleEmailChange = (e) => {
+    setFormData({ ...formData, email: e.target.value });
+    setEmailValid(validateEmail(e.target.value));
   };
 
   if (loading) {
@@ -87,10 +108,18 @@ function CustomerList() {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex gap-2 items-center">
+        <select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+        >
+          <option value="name">Name</option>
+          <option value="company">Company</option>
+        </select>
         <input
           type="text"
-          placeholder="Search customers..."
+          placeholder={`Search by ${searchType}...`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -108,6 +137,7 @@ function CustomerList() {
       {showAddForm && (
         <div className="bg-white shadow rounded-lg p-6 mb-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Customer</h3>
+          {formError && <div className="text-red-500 mb-4">{formError}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <input
@@ -123,8 +153,8 @@ function CustomerList() {
                 placeholder="Email *"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+                onChange={handleEmailChange}
+                className={`rounded-md shadow-sm px-4 py-2 border ${emailValid ? 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500' : 'border-red-500 focus:border-red-500 focus:ring-red-500'}`}
               />
               <input
                 type="text"
@@ -218,7 +248,7 @@ function CustomerList() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleDelete(customer.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 mr-4"
                     >
                       Delete
                     </button>
