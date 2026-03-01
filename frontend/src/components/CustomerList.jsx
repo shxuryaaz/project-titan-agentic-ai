@@ -15,6 +15,7 @@ function CustomerList() {
     company: '',
     notes: ''
   });
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     loadCustomers();
@@ -51,9 +52,10 @@ function CustomerList() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateEmail(formData.email)) {
-      alert('Please enter a valid email address.');
+      setFormError('Please enter a valid email address.');
       return;
     }
+    setFormError('');
     try {
       await customerAPI.create(formData);
       setShowAddForm(false);
@@ -126,6 +128,7 @@ function CustomerList() {
       {showAddForm && (
         <div className="bg-white shadow rounded-lg p-6 mb-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Customer</h3>
+          {formError && <div className="text-red-500 mb-4">{formError}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <input
