@@ -51,7 +51,7 @@ Once the backend is running, visit: http://localhost:8000/docs
 
 The **frontend** is set up to deploy on [Vercel](https://vercel.com).
 
-1. Push this repo to GitHub and import it in [Vercel](https://vercel.com/new). Vercel will use the root `vercel.json` and build from the `frontend` folder.
+1. Push this repo to GitHub and import it in [Vercel](https://vercel.com/new). In the project **Settings → General**, set **Root Directory** to `frontend` (so the build runs from the frontend app).
 2. (Optional) Deploy the backend elsewhere (e.g. [Railway](https://railway.app), [Render](https://render.com)) so the live app has a working API. Then in Vercel → Project → **Settings → Environment Variables**, add:
    - **Name:** `VITE_API_URL`  
    - **Value:** `https://your-backend-url.com`
