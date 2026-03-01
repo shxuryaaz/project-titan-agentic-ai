@@ -41,7 +41,7 @@ function CustomerList() {
     }
 
     try {
-      const response = await customerAPI.search(searchQuery, searchType); // Modified to include searchType
+      const response = await customerAPI.search(searchQuery, searchType === 'company' ? formData.company : searchQuery, searchType); // Modified to include company name in API call
       setCustomers(response.data.customers);
     } catch (err) {
       console.error('Search failed:', err);
