@@ -70,6 +70,12 @@ function CustomerList() {
     }
   };
 
+  const highlightMatch = (text) => {
+    if (!searchQuery) return text;
+    const parts = text.split(new RegExp(`(${searchQuery})`, 'gi'));
+    return parts.map((part, index) => part.toLowerCase() === searchQuery.toLowerCase() ? <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span> : part);
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-gray-500">Loading...</div>;
   }
@@ -198,13 +204,13 @@ function CustomerList() {
               customers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {customer.name}
+                    {highlightMatch(customer.name)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {customer.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {customer.company || '-'}
+                    {highlightMatch(customer.company || '-')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
