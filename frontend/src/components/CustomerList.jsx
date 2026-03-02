@@ -17,6 +17,7 @@ function CustomerList() {
   });
   const [formError, setFormError] = useState('');
   const [emailValid, setEmailValid] = useState(true);
+  const [exporting, setExporting] = useState(false); // Added exporting state
 
   useEffect(() => {
     loadCustomers();
@@ -91,6 +92,23 @@ function CustomerList() {
     setEmailValid(validateEmail(e.target.value));
   };
 
+  const exportCustomersCSV = async () => {
+    setExporting(true);
+    try {
+      const response = await customerAPI.exportCustomersCSV();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'customers.csv'); // or any other extension
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error('Export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-12 text-gray-500">Loading...</div>;
   }
@@ -99,12 +117,21 @@ function CustomerList() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-gray-900">Customers</h2>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-        >
-          {showAddForm ? 'Cancel' : 'Add Customer'}
-        </button>
+        <div>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 mr-2"
+          >
+            {showAddForm ? 'Cancel' : 'Add Customer'}
+          </button>
+          <button
+            onClick={exportCustomersCSV}
+            disabled={exporting}
+            className={`bg-green-600 text-white px-4 py-2 rounded-md ${exporting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+          >
+            Export
+          </button>
+        </div>
       </div>
 
       {/* Search Bar */}
