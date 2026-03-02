@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { leadAPI } from '../services/api';
+import Modal from './Modal'; // Assuming Modal is a component for handling modals
 
 function LeadPipeline() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStage, setSelectedStage] = useState('all');
+  const [showModal, setShowModal] = useState(false);
+  const [currentLeadId, setCurrentLeadId] = useState(null);
+  const [lostReason, setLostReason] = useState('');
 
   const stages = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 
@@ -29,11 +33,27 @@ function LeadPipeline() {
   };
 
   const handleStageChange = async (leadId, newStage) => {
+    if (newStage === 'lost') {
+      setCurrentLeadId(leadId);
+      setShowModal(true);
+    } else {
+      try {
+        await leadAPI.update(leadId, { stage: newStage });
+        loadLeads();
+      } catch (err) {
+        alert('Failed to update lead stage');
+      }
+    }
+  };
+
+  const handleLostReasonSubmit = async () => {
     try {
-      await leadAPI.update(leadId, { stage: newStage });
+      await leadAPI.update(currentLeadId, { stage: 'lost', lostReason: lostReason });
+      setShowModal(false);
+      setLostReason('');
       loadLeads();
     } catch (err) {
-      alert('Failed to update lead stage');
+      alert('Failed to mark lead as lost');
     }
   };
 
@@ -155,6 +175,25 @@ function LeadPipeline() {
           ))
         )}
       </div>
+
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)} title="Reason for Lost">
+          <div className="space-y-4">
+            <textarea
+              className="w-full p-2 border rounded"
+              placeholder="Enter reason"
+              value={lostReason}
+              onChange={(e) => setLostReason(e.target.value)}
+            ></textarea>
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              onClick={handleLostReasonSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
