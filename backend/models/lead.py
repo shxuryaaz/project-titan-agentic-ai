@@ -15,7 +15,7 @@ class Lead(Base):
     email = Column(String(255), nullable=False, index=True)
     phone = Column(String(20))
     company = Column(String(100))
-    stage = Column(String(20), default="new")  # new, contacted, qualified, proposal, won, lost
+    stage = Column(String(20), default="new")  # new, contacted, qualified, proposal, won, lost, Not_Qualified
     value = Column(Float, default=0.0)
     source = Column(String(50))  # website, referral, advertising, etc.
     notes = Column(Text)
