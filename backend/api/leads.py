@@ -46,6 +46,8 @@ def list_leads(
     query = db.query(Lead)
     if stage:
         query = query.filter(Lead.stage == stage)
+    else:
+        query = query.filter(Lead.stage != "Not Qualified")
     leads = query.offset(skip).limit(limit).all()
     return {"leads": [lead.to_dict() for lead in leads]}
 
