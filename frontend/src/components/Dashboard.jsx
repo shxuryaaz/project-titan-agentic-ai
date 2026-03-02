@@ -1,14 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { analyticsAPI } from '../services/api';
+import { analyticsAPI, searchCustomersByName } from '../services/api';
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    if (searchFilter.trim()) {
+      const fetchSearchResults = async () => {
+        try {
+          const response = await searchCustomersByName(searchFilter);
+          setSearchResults(response.data);
+        } catch (err) {
+          console.error('Failed to fetch search results', err);
+          setSearchResults([]);
+        }
+      };
+      fetchSearchResults();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchFilter]);
 
   const loadDashboard = async () => {
     try {
@@ -22,6 +41,10 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchFilter(e.target.value);
   };
 
   if (loading) {
@@ -43,6 +66,26 @@ function Dashboard() {
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          placeholder="Search..."
+          value={searchFilter}
+          onChange={handleSearchChange}
+        />
+      </div>
+
+      {searchFilter.trim() && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Search Results:</h3>
+          <ul className="list-disc pl-5">
+            {searchResults.map((customer) => (
+              <li key={customer.id}>{customer.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
