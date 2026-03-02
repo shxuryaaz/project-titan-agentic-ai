@@ -1,7 +1,7 @@
 """Customer API endpoints."""
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 
@@ -98,3 +98,16 @@ def search_customers(q: str, db: Session = Depends(get_db)):
     """Search customers."""
     customers = CustomerService.search_customers(db, q)
     return {"customers": [c.to_dict() for c in customers]}
+
+
+@router.get("/export")
+def export_customers(db: Session = Depends(get_db)):
+    """Export list of customers to CSV."""
+    customers = CustomerService.get_all_customers(db)
+    csv_content = "Name,Email,Phone,Company,Notes\n"
+    for customer in customers:
+        csv_content += f"{customer.name},{customer.email},{customer.phone or ''},{customer.company or ''},{customer.notes or ''}\n"
+    headers = {
+        "Content-Disposition": "attachment; filename=customers.csv"
+    }
+    return Response(content=csv_content, media_type="text/csv", headers=headers)
