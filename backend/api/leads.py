@@ -21,6 +21,7 @@ class LeadCreate(BaseModel):
     value: float = 0.0
     source: Optional[str] = None
     notes: Optional[str] = None
+    stage: Optional[str] = None
 
 
 class LeadUpdate(BaseModel):
@@ -62,7 +63,9 @@ def get_lead(lead_id: int, db: Session = Depends(get_db)):
 @router.post("/")
 def create_lead(lead_data: LeadCreate, db: Session = Depends(get_db)):
     """Create new lead."""
-    lead = Lead(**lead_data.model_dump())
+    if lead_data.stage and lead_data.stage == "Not_Qualified":
+        raise HTTPException(status_code=400, detail="Cannot create lead with 'Not_Qualified' status")
+    lead = Lead(**lead_data.dict())
     db.add(lead)
     db.commit()
     db.refresh(lead)
@@ -80,7 +83,10 @@ def update_lead(
     if not lead:
         raise HTTPException(status_code=404, detail="Lead not found")
 
-    updates = lead_data.model_dump(exclude_unset=True)
+    if lead_data.stage and lead_data.stage == "Not_Qualified":
+        raise HTTPException(status_code=400, detail="Cannot update lead to 'Not_Qualified' status")
+
+    updates = lead_data.dict(exclude_unset=True)
     for key, value in updates.items():
         setattr(lead, key, value)
 
