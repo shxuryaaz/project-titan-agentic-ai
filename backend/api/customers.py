@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
+from datetime import date
 
 from backend.database import get_db
 from backend.services.customer_service import CustomerService
@@ -35,10 +36,12 @@ class CustomerUpdate(BaseModel):
 def list_customers(
     skip: int = 0,
     limit: int = 100,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
     db: Session = Depends(get_db)
 ):
     """Get list of customers."""
-    customers = CustomerService.get_all_customers(db, skip=skip, limit=limit)
+    customers = CustomerService.get_all_customers(db, skip=skip, limit=limit, start_date=start_date, end_date=end_date)
     return {"customers": [c.to_dict() for c in customers]}
 
 
