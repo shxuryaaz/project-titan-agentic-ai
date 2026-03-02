@@ -35,6 +35,12 @@ class LeadUpdate(BaseModel):
     notes: Optional[str] = None
 
 
+class LeadStageUpdate(BaseModel):
+    """Schema for updating lead stage to 'Lost'."""
+    stage: str
+    reason: Optional[str] = None
+
+
 @router.get("/")
 def list_leads(
     skip: int = 0,
@@ -83,6 +89,29 @@ def update_lead(
     updates = lead_data.model_dump(exclude_unset=True)
     for key, value in updates.items():
         setattr(lead, key, value)
+
+    db.commit()
+    db.refresh(lead)
+    return lead.to_dict()
+
+
+@router.put("/{lead_id}/stage")
+def update_lead_stage(
+    lead_id: int,
+    stage_data: LeadStageUpdate,
+    db: Session = Depends(get_db)
+):
+    """Update lead stage to 'Lost' and record the reason."""
+    if stage_data.stage != 'Lost':
+        raise HTTPException(status_code=400, detail="This endpoint is only for updating the lead stage to 'Lost'.")
+
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    lead.stage = stage_data.stage
+    if stage_data.reason:
+        lead.notes = (lead.notes or '') + f"\nStage updated to 'Lost' for reason: {stage_data.reason}"
 
     db.commit()
     db.refresh(lead)
