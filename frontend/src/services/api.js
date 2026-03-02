@@ -22,7 +22,10 @@ export const customerAPI = {
 // Lead API
 export const leadAPI = {
   getAll: (stage = null) => {
-    const params = stage ? `?stage=${stage}` : '';
+    let params = '';
+    if (stage) {
+      params = stage === 'Not_Qualified' ? '?stage=Not%20Qualified' : `?stage=${stage}`;
+    }
     return api.get(`/api/leads/${params}`);
   },
   getById: (id) => api.get(`/api/leads/${id}`),
