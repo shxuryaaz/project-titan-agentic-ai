@@ -1,6 +1,6 @@
 """Lead model."""
 
-from sqlalchemy import Column, Integer, String, DateTime, Text, Float
+from sqlalchemy import Column, Integer, String, DateTime, Text, Float, Boolean
 from datetime import datetime
 from backend.database import Base
 
@@ -21,6 +21,7 @@ class Lead(Base):
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    not_qualified = Column(Boolean, default=False)
 
     def to_dict(self):
         """Convert to dictionary."""
@@ -35,5 +36,6 @@ class Lead(Base):
             "source": self.source,
             "notes": self.notes,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "not_qualified": self.not_qualified
         }
