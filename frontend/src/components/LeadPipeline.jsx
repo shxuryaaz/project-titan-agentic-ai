@@ -7,7 +7,7 @@ function LeadPipeline() {
   const [error, setError] = useState(null);
   const [selectedStage, setSelectedStage] = useState('all');
 
-  const stages = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+  const stages = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost', 'not_qualified'];
 
   useEffect(() => {
     loadLeads();
@@ -45,6 +45,7 @@ function LeadPipeline() {
       proposal: 'bg-indigo-100 text-indigo-800',
       won: 'bg-green-100 text-green-800',
       lost: 'bg-red-100 text-red-800',
+      not_qualified: 'bg-orange-100 text-orange-800',
     };
     return colors[stage] || 'bg-gray-100 text-gray-800';
   };
@@ -79,7 +80,7 @@ function LeadPipeline() {
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            {stage}
+            {stage.replace('_', ' ')}
           </button>
         ))}
       </div>
@@ -109,7 +110,7 @@ function LeadPipeline() {
                   <p className="text-sm text-gray-500">{lead.email}</p>
                 </div>
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full capitalize ${getStageColor(lead.stage)}`}>
-                  {lead.stage}
+                  {lead.stage.replace('_', ' ')}
                 </span>
               </div>
 
@@ -146,7 +147,7 @@ function LeadPipeline() {
                 >
                   {stages.map((stage) => (
                     <option key={stage} value={stage} className="capitalize">
-                      {stage}
+                      {stage.replace('_', ' ')}
                     </option>
                   ))}
                 </select>
