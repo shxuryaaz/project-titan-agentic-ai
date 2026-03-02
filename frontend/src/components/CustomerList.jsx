@@ -6,7 +6,7 @@ function CustomerList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('name'); // Added search type state
+  const [searchType, setSearchType] = useState('name');
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -17,6 +17,8 @@ function CustomerList() {
   });
   const [formError, setFormError] = useState('');
   const [emailValid, setEmailValid] = useState(true);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     loadCustomers();
@@ -37,13 +39,13 @@ function CustomerList() {
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
+    if (!searchQuery.trim() && !startDate && !endDate) {
       loadCustomers();
       return;
     }
 
     try {
-      const response = await customerAPI.search(searchQuery, searchType); // Adjusted for clarity
+      const response = await customerAPI.search(searchQuery, searchType, startDate, endDate);
       setCustomers(response.data.customers);
     } catch (err) {
       console.error('Search failed:', err);
@@ -117,6 +119,18 @@ function CustomerList() {
           <option value="name">Name</option>
           <option value="company">Company</option>
         </select>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+        />
         <input
           type="text"
           placeholder={`Search by ${searchType}...`}
