@@ -43,7 +43,7 @@ def list_leads(
     db: Session = Depends(get_db)
 ):
     """Get list of leads."""
-    query = db.query(Lead)
+    query = db.query(Lead).filter(Lead.stage != "Not Qualified")
     if stage:
         query = query.filter(Lead.stage == stage)
     leads = query.offset(skip).limit(limit).all()
