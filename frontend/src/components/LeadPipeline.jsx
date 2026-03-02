@@ -7,7 +7,7 @@ function LeadPipeline() {
   const [error, setError] = useState(null);
   const [selectedStage, setSelectedStage] = useState('all');
 
-  const stages = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+  const stages = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost', 'not qualified'];
 
   useEffect(() => {
     loadLeads();
@@ -45,6 +45,7 @@ function LeadPipeline() {
       proposal: 'bg-indigo-100 text-indigo-800',
       won: 'bg-green-100 text-green-800',
       lost: 'bg-red-100 text-red-800',
+      'not qualified': 'bg-gray-100 text-gray-800',
     };
     return colors[stage] || 'bg-gray-100 text-gray-800';
   };

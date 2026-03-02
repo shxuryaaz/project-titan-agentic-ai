@@ -29,6 +29,7 @@ export const leadAPI = {
   create: (data) => api.post('/api/leads/', data),
   update: (id, data) => api.put(`/api/leads/${id}`, data),
   delete: (id) => api.delete(`/api/leads/${id}`),
+  fetchNotQualified: () => api.get(`/api/leads/?tag=Not%20Qualified`),
 };
 
 // Analytics API
