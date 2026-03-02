@@ -1,15 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { analyticsAPI } from '../services/api';
+import { analyticsAPI, searchCustomersByName } from '../services/api';
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    if (searchFilter.trim()) {
+      const fetchSearchResults = async () => {
+        try {
+          const response = await searchCustomersByName(searchFilter);
+          setSearchResults(response.data);
+        } catch (err) {
+          console.error('Failed to fetch search results', err);
+          setSearchResults([]);
+        }
+      };
+      fetchSearchResults();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchFilter]);
 
   const loadDashboard = async () => {
     try {
@@ -57,6 +75,17 @@ function Dashboard() {
           onChange={handleSearchChange}
         />
       </div>
+
+      {searchFilter.trim() && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Search Results:</h3>
+          <ul className="list-disc pl-5">
+            {searchResults.map((customer) => (
+              <li key={customer.id}>{customer.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
