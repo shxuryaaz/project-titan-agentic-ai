@@ -29,6 +29,7 @@ export const leadAPI = {
   create: (data) => api.post('/api/leads/', data),
   update: (id, data) => api.put(`/api/leads/${id}`, data),
   delete: (id) => api.delete(`/api/leads/${id}`),
+  updateLeadStage: (leadId, stage, reason) => api.put(`/api/leads/${leadId}/stage`, { stage, reason }),
 };
 
 // Analytics API
