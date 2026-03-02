@@ -17,6 +17,7 @@ function CustomerList() {
   });
   const [formError, setFormError] = useState('');
   const [emailValid, setEmailValid] = useState(true);
+  const [exporting, setExporting] = useState(false); // Added exporting state
 
   useEffect(() => {
     loadCustomers();
@@ -92,6 +93,7 @@ function CustomerList() {
   };
 
   const exportCustomersCSV = async () => {
+    setExporting(true);
     try {
       const response = await customerAPI.exportCustomersCSV();
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -102,6 +104,8 @@ function CustomerList() {
       link.click();
     } catch (err) {
       console.error('Export failed:', err);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -122,7 +126,8 @@ function CustomerList() {
           </button>
           <button
             onClick={exportCustomersCSV}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+            disabled={exporting}
+            className={`bg-green-600 text-white px-4 py-2 rounded-md ${exporting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
           >
             Export
           </button>
