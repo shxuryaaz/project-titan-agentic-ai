@@ -11,7 +11,7 @@ const api = axios.create({
 
 // Customer API
 export const customerAPI = {
-  getAll: () => api.get('/api/customers/'),
+  getAll: (start_date = '', end_date = '') => api.get(`/api/customers/?start_date=${start_date}&end_date=${end_date}`),
   getById: (id) => api.get(`/api/customers/${id}`),
   create: (data) => api.post('/api/customers/', data),
   update: (id, data) => api.put(`/api/customers/${id}`, data),
