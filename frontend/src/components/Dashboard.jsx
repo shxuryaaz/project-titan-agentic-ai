@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { analyticsAPI } from '../services/api';
+import SearchFilter from './SearchFilter';
+import { useCustomerSearch } from '../hooks/useCustomerSearch';
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredStats = useCustomerSearch(stats, searchTerm);
 
   useEffect(() => {
     loadDashboard();
@@ -43,6 +48,7 @@ function Dashboard() {
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
+      <SearchFilter value={searchTerm} onChange={setSearchTerm} />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -55,7 +61,7 @@ function Dashboard() {
                   Total Customers
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  {stats?.customers?.total || 0}
+                  {filteredStats?.customers?.total || 0}
                 </dd>
               </div>
             </div>
@@ -71,7 +77,7 @@ function Dashboard() {
                   Active Customers
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold text-green-600">
-                  {stats?.customers?.active || 0}
+                  {filteredStats?.customers?.active || 0}
                 </dd>
               </div>
             </div>
@@ -87,7 +93,7 @@ function Dashboard() {
                   Total Leads
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  {stats?.leads?.total || 0}
+                  {filteredStats?.leads?.total || 0}
                 </dd>
               </div>
             </div>
@@ -103,7 +109,7 @@ function Dashboard() {
                   Pipeline Value
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold text-indigo-600">
-                  ${stats?.leads?.pipeline_value?.toLocaleString() || 0}
+                  ${filteredStats?.leads?.pipeline_value?.toLocaleString() || 0}
                 </dd>
               </div>
             </div>
@@ -112,11 +118,11 @@ function Dashboard() {
       </div>
 
       {/* Leads by Stage */}
-      {stats?.leads?.by_stage && (
+      {filteredStats?.leads?.by_stage && (
         <div className="mt-8 bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Leads by Stage</h3>
           <div className="space-y-3">
-            {Object.entries(stats.leads.by_stage).map(([stage, count]) => (
+            {Object.entries(filteredStats.leads.by_stage).map(([stage, count]) => (
               <div key={stage} className="flex items-center">
                 <div className="w-32 text-sm font-medium text-gray-700 capitalize">
                   {stage}
@@ -125,7 +131,7 @@ function Dashboard() {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-indigo-600 h-2 rounded-full"
-                      style={{ width: `${(count / stats.leads.total) * 100}%` }}
+                      style={{ width: `${(count / filteredStats.leads.total) * 100}%` }}
                     ></div>
                   </div>
                 </div>
